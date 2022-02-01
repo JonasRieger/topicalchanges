@@ -47,6 +47,7 @@ texts = lapply(texts, function(x){
   removeNumbers(x)
   x[nchar(x) > 1]
 })
+saveRDS(texts, file.path("data", "texts_observador.rds"))
 
 dates = news_observador$date
 
@@ -112,23 +113,25 @@ for(rel in c(0.8, 0.85)){
     tab = table(factor(unlist(assignments[roll$dates >= limits$start.date &
                                             roll$dates <= limits$end.date])+1, levels = 1:K))
     for(k in seq_len(K)){
-      topics_run = rowSums(topics[[k]][,max(1,i-z1[k]):(i-1), drop = FALSE])
-      sim1[i, k] = cosine(topics[[k]][,i], topics_run)
-      topics_tmp = Reduce("+", topics_chunks[max(1,i-z1[k]):(i-1)]) + eta
-      phi = topics_tmp / rowSums(topics_tmp)
-      topics_tmp = topics_chunks[[i]] + eta
-      phi_tmp = phi[k,] 
-      phi = topics_tmp / rowSums(topics_tmp)
-      phi_tmp = (1-rel)*phi_tmp + rel*phi[k,]
-      quantiles = replicate(500, {
-        topics_resampled = tabulate(
-          sample(length(vocab),
-                 size = tab[k],
-                 replace = TRUE,
-                 prob = phi_tmp), nbins = length(vocab))
-        cosine(topics_resampled, topics_run)
-      })
-      quantiles1[i, k] = quantile(quantiles, 0.01)
+      if(tab[k] > 0){
+        topics_run = rowSums(topics[[k]][,max(1,i-z1[k]):(i-1), drop = FALSE])
+        sim1[i, k] = cosine(topics[[k]][,i], topics_run)
+        topics_tmp = Reduce("+", topics_chunks[max(1,i-z1[k]):(i-1)]) + eta
+        phi = topics_tmp / rowSums(topics_tmp)
+        topics_tmp = topics_chunks[[i]] + eta
+        phi_tmp = phi[k,] 
+        phi = topics_tmp / rowSums(topics_tmp)
+        phi_tmp = (1-rel)*phi_tmp + rel*phi[k,]
+        quantiles = replicate(500, {
+          topics_resampled = tabulate(
+            sample(length(vocab),
+                   size = tab[k],
+                   replace = TRUE,
+                   prob = phi_tmp), nbins = length(vocab))
+          cosine(topics_resampled, topics_run)
+        })
+        quantiles1[i, k] = quantile(quantiles, 0.01)
+      }else quantiles1[i, k] = 0
     }
     run_length1[sim1[i,] < quantiles1[i,]] = 0L
   }

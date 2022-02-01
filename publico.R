@@ -48,6 +48,7 @@ texts = lapply(texts, function(x){
   removeNumbers(x)
   x[nchar(x) > 1]
 })
+saveRDS(texts, file.path("data", "texts_publico.rds"))
 
 dates = news_publico$date
 
@@ -58,7 +59,7 @@ roll = RollingLDA(texts, dates,
                   chunks = "week",
                   memory = "week",
                   memory.fallback = 10,
-                  init = "2020-01-31",
+                  init = "2020-03-20",
                   K = k)
 saveRDS(roll, file.path("roll", paste0(k, "_publico.rds")))
 
@@ -101,7 +102,7 @@ cosine = function(a, b) sum(a*b) / sqrt(sum(a^2)) / sqrt(sum(b^2))
 nchunks = nrow(roll$chunks)
 
 z = 4
-for(rel in c(0.8, 0.85)){
+for(rel in c(0.75, 0.8, 0.85)){
   q = rel
   sim1 = quantiles1 = matrix(NA_real_, ncol = K, nrow = nchunks)
   run_length1 = integer(K)
