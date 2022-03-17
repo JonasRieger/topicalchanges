@@ -2,7 +2,7 @@
 
 This repository provides some results, data and scripts related to the paper:
 
-* Rieger, J., Lange, K.-R., Flossdorf, J. & Jentsch, C. (2022). Dynamic change detection in topics based on rolling LDAs. Accepted for Proceedings of the [Text2Story'22 Workshop](https://text2story22.inesctec.pt/).
+* Rieger, J., Lange, K.-R., Flossdorf, J. & Jentsch, C. (2022). Dynamic change detection in topics based on rolling LDAs. Accepted for Proceedings of the [Text2Story'22 Workshop](https://text2story22.inesctec.pt/). [pdf](https://github.com/JonasRieger/topicalchanges/raw/main/paper_change_detetion_topics_rollinglda.pdf).
 
 For bug reports, comments and questions please use the [issue tracker](https://github.com/JonasRieger/topicalchanges/issues).
 
