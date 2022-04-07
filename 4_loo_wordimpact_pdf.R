@@ -40,7 +40,7 @@ events_ind = apply(sim < quantiles, 2, function(d) which(d))
 loo = lapply(seq_along(events_ind), function(k){
   if(length(events_ind[[k]]) > 0){
     loo = sapply(events_ind[[k]], function(i){
-      tmp = rowSums(topics[[k]][,max(1,i-8):(i-1), drop = FALSE])
+      tmp = rowSums(topics[[k]][,max(1,i-z):(i-1), drop = FALSE])
       loo = cosine(topics[[k]][,i], tmp) -
         sapply(seq_len(length(vocab)), function(j) cosine(topics[[k]][,i][-j], tmp[-j]))
     })
@@ -55,11 +55,19 @@ for(k in seq_len(K)){
   zaehler = 0
   for(i in colnames(loo[[k]])){
     zaehler = zaehler + 1
-    tmp = c(head(sort(loo[[k]][,i]), 10), tail(sort(loo[[k]][,i]), 3))
+    #tmp = c(head(sort(loo[[k]][,i]), 10), tail(sort(loo[[k]][,i]), 3))
+    tmp = head(sort(loo[[k]][,i]), 15)
+    prev = rowSums(topics[[k]][,max(1,as.integer(i)-z):(as.integer(i)-1), drop = FALSE])
+    prev = (prev/sum(prev))[names(tmp)]
+    now.tot = topics[[k]][,as.integer(i)]
+    now = (now.tot/sum(now.tot))[names(tmp)]
+    now.tot = now.tot[names(tmp)]
     print(ggplot() +
-            geom_bar(aes(x = reorder(names(tmp), tmp), y = tmp), stat = "identity") +
+            geom_bar(aes(x = reorder(names(tmp), tmp), y = tmp, fill = now-prev > 0), stat = "identity") +
             xlab("") + ylab("Impact on Cosine Similarity") +
-            ggtitle(paste0(events_start[[k]][zaehler], " - ", events_end[[k]][zaehler], ", Topic ", k, ": ", topwords[k])))
+            ggtitle(paste0(events_start[[k]][zaehler], " - ", events_end[[k]][zaehler], ", Topic ", k, ": ", topwords[k])) +
+            geom_text(aes(label = now.tot, y = min(tmp)*0.01, x = names(tmp)), vjust = 1) +
+            theme(legend.position = "none"))
   }
 }
 dev.off()
